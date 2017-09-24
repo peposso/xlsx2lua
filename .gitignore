@@ -1,0 +1,38 @@
+# Compiled Object files
+*.obj
+*.slo
+*.lo
+*.o
+*.o-*
+
+# Compiled Dynamic libraries
+*.so
+*.dylib
+
+# Compiled Static libraries
+*.lai
+*.la
+*.a
+
+# Binaries
+*.exe
+*.dll
+*.lib
+*.ilk
+*.pdb
+*.dSYM/
+
+# Visual Studio files
+Obj/**
+*.psess
+*.vspx
+*.suo
+*.sdf
+*.opensdf
+/.vscode
+
+# target
+/xlsx2lua
+/xlsx2lua.exe
+
+.DS_Store
