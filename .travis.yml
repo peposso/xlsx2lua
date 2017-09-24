@@ -16,22 +16,22 @@ matrix:
   - os: osx
     compiler: clang
 before_install:
-  - if [ "$CXX" = "g++" ]; then export CXX="g++-5" CC="gcc-5"; fi
+- if [ "$CXX" = "g++" ]; then export CXX="g++-5" CC="gcc-5"; fi
 before_script: 
 script:
-  - make
-  - make test
-  - make release
+- make
+- make test
+- make release
 after_success: 
 notifications:
   email: false
 before_deploy:
-  - export RELEASE_PKG_FILE=$(ls build/*.zip)
-  - echo "deploying $RELEASE_PKG_FILE to GitHub releases"
+- export RELEASE_PKG_FILE=$(ls build/*.zip)
+- echo "deploying $RELEASE_PKG_FILE to GitHub releases"
 deploy:
   provider: releases
   api_key:
-    secure: ZxKrXOvkkD5f2AvdC0aSAfyMvMBlBHACGU7Tch3wvDFxzobnpy+aTvlVtf/XRXpJwVQtLrVlLetYBwU2ALWMVrx/P1xCa8ZWQ0KcVzMlKoRtsCaL+7uZoXPf8Sknae8DnzbCcH2cfGgHkQu8XDBHxDnCgTgecrNXtcXnt0e2X1Iuo6NPHUpOo68cdb8bKNuyZ0Etdpc2g1GumSMNByQe4wgI3nqbcyWV3BHvraJ7HECQLngGM3BxFXp1bXocruEa28dzO5cBoIS8FiWjI6O4lt3YY0hO2OTTvMuxyEzTFKA35hKvFBsYyjEoWZvGBbC7CsDo8zXDKsPS9+o6dMZA1mRwRoNRyxJHdvfY8TBRxFmzhxArtaeBlN9lTVBIz3SYpc9aloCRKzCN/jJup+h3Q1OhxUgx76LPMBLyQD/KUR5bwdx/fdiSg71GvjaplFOtLSHd9nD5rz3HGJj94nK40HYGMklCAgO+KTqSVlctwBMrAknKEJFk1ur+R/RfDzKJ3c0TF1tIlBjuJAuSeg4EGPex28CEAQOXctN6eHiHL68Vjrye52ngds7XUoM8B3YApaJq76grlAh0WD1nWZt8O3uEgYFKSoqzr2t1YSFPlx0zzVDLEqZVi1gMlKeBHjq+0seCmjqZ6B8zGaZQ36VQdfbGEEIL3gl3cSTNPKTke5c=
+    secure: kKnsr4zVEtM6a04CUlNe9WjvInsAdFeOzfO/9igSAyjXXTSKldWsHBjXZ7iXWyVu7/9rcxn6Btxnf3b1CaUFnntepB4VPHSdRKnonvWk5l7TIRkDL/PChpuptnBWH5dTYAjEasr0pSHSH/iEz0G39KtjSLL7OamstM4MAEl5q0ZZNnLNA9qpn7CTnpT8xTXSkKYLM7iRy1RxEITV9LfnPWENC5G5GC4b2eLR1F9OnCTRja9WrIVOD48uDEf72lsii8RkzcStBtx/5pnHB7jTc8sURYWox5qsslL8JD4hqjik9Lt/fKiJ+ON80QSFPcOSedlsG95GLb0x11lH5Rkt/KtT9b2Osv54nBLb848AbnuT4fLMwpTfCdqgpMv5QlAHQFKY9mHPK9nTFZ7hSc/udEJZQ2N9YGibpkv7h5v0Hw+e3daXcLSVLckq+TEKtujJkvisSKWPD4goYOykpCsqwUWiNvq1vSAN7or6pPBHh73v8eteMZclLMUBa9S8OoroPzd8O++uwIyiDs5o+5ILwuvqxbOcHYcVUPyb5DRKeOCYKmdBuIj9pOBwwJZJuYuMpbr++3geTcER3buuTvBSG9RdPwYrc7CInI9/o4JQ0Gxv+frfgFUY864PTCssDGj/7BuKNY7Y/FkjpZp3v0Aj0PjvM0s1/AXN9Sp2CO34CfA=
   file_glob: true
   file: "${RELEASE_PKG_FILE}"
   on:

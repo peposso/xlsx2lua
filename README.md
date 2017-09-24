@@ -1,8 +1,5 @@
 # xlsx2lua
 
-xlsx to data converter written in c++11.
-[ssc](https://github.com/yamionp/spreadsheetconverter/) compatible.
-
 [![Build Status](https://travis-ci.org/peposso/xlsx2lua.svg?branch=master)](https://travis-ci.org/peposso/xlsx2lua)
 [![Build status](https://ci.appveyor.com/api/projects/status/v1ypkdk9km026dyy?svg=true)](https://ci.appveyor.com/project/peposso/xlsx2lua)
 
