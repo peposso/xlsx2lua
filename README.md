@@ -3,8 +3,8 @@
 xlsx to data converter written in c++11.
 [ssc](https://github.com/yamionp/spreadsheetconverter/) compatible.
 
-[![Build Status](https://travis-ci.org/peposso/xlsxconverter.svg?branch=master)](https://travis-ci.org/peposso/xlsxconverter)
-[![Build status](https://ci.appveyor.com/api/projects/status/mh6nqcgibro2nvho?svg=true)](https://ci.appveyor.com/project/peposso/xlsxconverter)
+[![Build Status](https://travis-ci.org/peposso/xlsx2lua.svg?branch=master)](https://travis-ci.org/peposso/xlsx2lua)
+[![Build status](https://ci.appveyor.com/api/projects/status/v1ypkdk9km026dyy?svg=true)](https://ci.appveyor.com/project/peposso/xlsx2lua)
 
 ## LICENSE
 
