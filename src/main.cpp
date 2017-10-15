@@ -38,63 +38,106 @@ std::string lua_escape(const std::string& s) {
 }
 
 int main(int argc, char** argv) {
-    std::string input_file;
+    std::string xlsx_file;
+    bool no_pretty = false;
+    bool has_arg_error = false;
+    bool skip_empty_row = false;
+    auto tz = dateutil::local_tz_seconds();
 
-    if (argc != 2) {
-        std::cerr << argv[0] << " {input-xlsx}" << std::endl;
+    for (int i = 1; i < argc; ++i) {
+        std::string arg = argv[i];
+        if (arg[0] == '-') {
+            if (arg == "--no-pretty") {
+                no_pretty = true;
+            } else if (arg == "--skip-empty-row") {
+                skip_empty_row = true;
+            } else {
+                has_arg_error = true;
+            }
+        } else {
+            xlsx_file = arg;
+        }
+    }
+    if (has_arg_error || xlsx_file.empty()) {
+        std::cerr <<
+            "usage: xlsx2lua " <<
+            "[--no-pretty] " <<
+            "[--skip-empty-row] " <<
+            "[--timezone '+00:00'] " <<
+            "xlsx_file" <<
+            std::endl;
         return 1;
     }
-    input_file = argv[1];
-    auto tz = dateutil::local_tz_seconds();
-    std::cerr << "local_tz_seconds:" << tz << std::endl;
 
-    xlsx::Workbook book(input_file);
+    auto sp = no_pretty ? "" : " ";
+    auto nl = no_pretty ? "" : "\n";
+    auto idt = no_pretty ? "" : "  ";
 
-    std::cout << "return {\n";
-    std::cout << "  sheets = {\n";
+    xlsx::Workbook book(xlsx_file);
+    std::cout << "return" << sp << "{" << nl;
+    std::cout << idt << "sheets" << sp << "=" << sp << "{" << nl;
     for (int i = 0; i < book.nsheets(); ++i) {
         auto& sheet = book.sheet(i);
-        std::cout << "    { name = " << lua_escape(sheet.name) << ",\n";
-        std::cout << "      cells = {\n";
-        for (int r = 0; r < sheet.nrows(); ++r) {
-            std::cout << "        {";
+        if (i != 0) {
+            std::cout << "," << nl;
+        }
+        std::cout <<
+            idt << idt << "{" << sp << "name" << sp << "=" << sp <<
+            lua_escape(sheet.name) << "," << nl;
+        std::cout <<
+            idt << idt << idt << "cells" << sp << "=" << sp << "{";
+        auto firstrow = true;
+        for (int y = 0; y < sheet.nrows(); ++y) {
             int ncols = -1;
-            for (int c = sheet.ncols() - 1; c >= 0; --c) {
-                if (!sheet.cell(r, c).empty()) {
-                    ncols = c + 1;
+            for (int x = sheet.ncols() - 1; x >= 0; --x) {
+                if (!sheet.cell(y, x).empty()) {
+                    ncols = x + 1;
                     break;
                 }
             }
-            for (int c = 0; c < ncols; ++c) {
-                auto& cell = sheet.cell(r, c);
+            if (skip_empty_row && ncols == -1) {
+                continue;
+            }
+            if (firstrow) {
+                std::cout << nl;
+            } else {
+                std::cout << "," << nl;
+            }
+            std::cout << idt << idt << idt << idt << "{";
+            firstrow = false;
+            for (int x = 0; x < ncols; ++x) {
+                if (x > 0) {
+                    std::cout << ",";
+                }
+                auto& cell = sheet.cell(y, x);
                 switch (cell.type) {
                     // kEmpty, kString, kInt, kDouble, kDateTime, kBool
                     case xlsx::Cell::Type::kEmpty:
-                        std::cout << "\"\",";
+                        std::cout << "\"\"";
                         break;
                     case xlsx::Cell::Type::kString:
-                        std::cout << lua_escape(cell.as_str()) << ",";
+                        std::cout << lua_escape(cell.as_str());
                         break;
                     case xlsx::Cell::Type::kInt:
-                        std::cout << cell.as_int() << ",";
+                        std::cout << cell.as_int();
                         break;
                     case xlsx::Cell::Type::kDouble:
-                        std::cout << cell.as_double() << ",";
+                        std::cout << cell.as_double();
                         break;
                     case xlsx::Cell::Type::kDateTime:
-                        std::cout << lua_escape(dateutil::isoformat64(cell.as_time64(tz), tz)) << ",";
+                        std::cout << lua_escape(dateutil::isoformat64(cell.as_time64(tz), tz));
                         break;
                     case xlsx::Cell::Type::kBool:
-                        std::cout << (cell.as_bool() ? "true" : "false") << ",";
+                        std::cout << (cell.as_bool() ? "true" : "false");
                         break;
                 }
             }
-            std::cout << "},\n";
+            std::cout << "}" << nl;
         }
-        std::cout << "      },\n";
-        std::cout << "    },\n";
+        std::cout << idt << idt << idt << "}";
+        std::cout << idt << idt << "}";
     }
-    std::cout << "  },\n";
+    std::cout << idt << "}";
     std::cout << "}\n";
 
     return 0;

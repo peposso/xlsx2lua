@@ -3,6 +3,35 @@
 [![Build Status](https://travis-ci.org/peposso/xlsx2lua.svg?branch=master)](https://travis-ci.org/peposso/xlsx2lua)
 [![Build status](https://ci.appveyor.com/api/projects/status/v1ypkdk9km026dyy?svg=true)](https://ci.appveyor.com/project/peposso/xlsx2lua)
 
+## USAGE
+
+    usage: xlsx2lua [--no-pretty] [--skip-empty-row] [--timezone '+00:00'] xlsx_file
+
+## EXAMPLE
+
+lua code
+
+    local function main(xlsx_file)
+        print('file: '..xlsx_file)
+
+        local proc = io.popen('./xlsx2lua --no-pretty --skip-empty-row '..xlsx_file)
+        local stdout = proc:read('*a')
+        proc:close()
+
+        local book = load(stdout)()
+        for _, sheet in ipairs(book.sheets) do
+            print(string.rep('-', 80))
+            print('sheet.name: '..sheet.name)
+            local cells = sheet.cells
+            for y, row in ipairs(cells) do
+                for x, col in ipairs(row) do
+                    print(string.format('cell(%d,%d): %s', x, y, col))
+                end
+            end
+        end
+    end
+    main("tests/sample.xlsx")
+
 ## LICENSE
 
 MIT license
