@@ -98,11 +98,7 @@ int main(int argc, char** argv) {
             if (skip_empty_row && ncols == -1) {
                 continue;
             }
-            if (firstrow) {
-                std::cout << nl;
-            } else {
-                std::cout << "," << nl;
-            }
+            std::cout << nl;
             std::cout << idt << idt << idt << idt << "{";
             firstrow = false;
             for (int x = 0; x < ncols; ++x) {
@@ -132,13 +128,17 @@ int main(int argc, char** argv) {
                         break;
                 }
             }
-            std::cout << "}" << nl;
+            if (y == sheet.nrows() - 1) {
+                std::cout << "}";
+            } else {
+                std::cout << "},";
+            }
         }
-        std::cout << idt << idt << idt << "}";
-        std::cout << idt << idt << "}";
+        std::cout << nl << idt << idt << idt << "}";
+        std::cout << nl << idt << idt << "}";
     }
-    std::cout << idt << "}";
-    std::cout << "}\n";
+    std::cout << nl << idt << "}";
+    std::cout << nl << "}\n";
 
     return 0;
 }

@@ -536,7 +536,6 @@ struct Workbook {
     std::unordered_map<std::string, int> entry_indexes;
     std::vector<std::string> entry_names;  // for debug
     std::unordered_map<std::string, std::string> rels;
-    int nsheets_ = -1;
 
     std::unordered_map<std::string, std::string> sheet_rid_by_name;
     std::unordered_map<std::string, std::string> sheet_name_by_rid;
@@ -696,7 +695,7 @@ struct Workbook {
         return sheet(rid);
     }
 
-    inline int nsheets() { return nsheets_; }
+    inline int nsheets() { return sheet_rids.size(); }
 
     inline
     Sheet& sheet(std::string rid) {
