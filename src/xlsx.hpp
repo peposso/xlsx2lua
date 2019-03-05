@@ -38,6 +38,24 @@ std::string sscat(const A&...a) {
     return ss.str();
 }
 
+inline bool& verbose() {
+    static bool verbose_ = false;
+    return verbose_;
+}
+
+inline std::mutex& log_mutex() {
+    static std::mutex log_mutex_;
+    return log_mutex_;
+}
+
+template<class...A>
+void logv(const A&...a) {
+    if (!verbose()) return;
+    auto s = sscat(a...);
+    std::lock_guard<std::mutex> lock(log_mutex());
+    std::cout << s << "\n";
+}
+
 struct Exception: std::runtime_error {
     template<class...A>
     inline explicit Exception(A...a) : std::runtime_error(sscat(a...).c_str()) {}
@@ -248,7 +266,7 @@ struct Cell {
         if (*it == '+' || *it == '-') ++it;
         bool digit = false;
         bool dot = false;
-        for (;it != v.end(); ++it) {
+        for (; it != v.end(); ++it) {
             if ('0' <= *it && *it <= '9') {
                 digit = true;
             } else if (*it == '.') {
@@ -259,7 +277,7 @@ struct Cell {
                 ++it;
                 if (*it == '+' || *it == '-') ++it;
                 bool expdigit = false;
-                for (;it != v.end(); ++it) {
+                for (; it != v.end(); ++it) {
                     if ('0' <= *it && *it <= '9') {
                         expdigit = true;
                     } else {
@@ -518,6 +536,7 @@ struct Workbook {
     std::unordered_map<std::string, int> entry_indexes;
     std::vector<std::string> entry_names;  // for debug
     std::unordered_map<std::string, std::string> rels;
+    int nsheets_ = -1;
 
     std::unordered_map<std::string, std::string> sheet_rid_by_name;
     std::unordered_map<std::string, std::string> sheet_name_by_rid;
@@ -546,6 +565,7 @@ struct Workbook {
         for (size_t i = 0; i < count; ++i) {
             auto entry = archive->GetEntry(static_cast<int>(i));
             std::string fullname = entry->GetFullName();
+            entry_names.push_back(fullname);
             auto p = fullname.rfind('.');
             if (p == std::string::npos) continue;
             auto ext = fullname.substr(p);
@@ -556,7 +576,7 @@ struct Workbook {
                 continue;
             }
             entry_indexes[fullname] = i;
-            entry_names.push_back(fullname);
+            logv("entry_index:", i, "  entry_name:", fullname);
         }
 
         if (entry_indexes.count("xl/workbook.xml") == 0) {
@@ -591,6 +611,7 @@ struct Workbook {
                     throw Exception("duplicate r:id=", rid, " entry=", entry_names[i]);
                 }
                 rels[rid] = target;
+                logv("rid:", rid, "  target:", target);
             }
         }
 
@@ -602,6 +623,7 @@ struct Workbook {
             sheet_rid_by_name[sheet_name] = sheet_rid;
             sheet_name_by_rid[sheet_rid] = sheet_name;
             sheet_rids.push_back(sheet_rid);
+            logv("sheet_rid:", sheet_rid, "  sheet_name:", sheet_name);
         }
 
         auto shared_string_doc = load_doc("xl/sharedStrings.xml");
@@ -668,13 +690,13 @@ struct Workbook {
         return load_doc(it->second);
     }
 
-    inline int nsheets() { return sheet_rids.size(); }
-
     inline
     Sheet& sheet(int index) {
         auto rid = sheet_rids[index];
         return sheet(rid);
     }
+
+    inline int nsheets() { return nsheets_; }
 
     inline
     Sheet& sheet(std::string rid) {
