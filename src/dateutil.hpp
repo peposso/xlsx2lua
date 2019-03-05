@@ -299,7 +299,7 @@ std::string isoformat64(int64_t time, int tz_seconds = 0,
     int tz_minutes = tz_seconds / 60;
     int tz_hour = tz_minutes / 60;
     int tz_minute = tz_minutes % 60;
-    ss << std::setfill('0') << std::setw(2) << tz_hour;
+    ss << std::setfill('0') << std::setw(2) << tz_hour << ':';
     ss << std::setfill('0') << std::setw(2) << tz_minute;
     return ss.str();
 }
